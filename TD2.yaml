@@ -1,0 +1,358 @@
+openapi: 3.0.1
+info:
+  title: 'Salle de cinema'
+  description: Gestion de projection de films
+  version: 1.0.0
+servers:
+  - url: https://salledecinema.com
+
+paths:
+  /salles: 
+    get:
+      tags:
+        - Salles
+      summary: Voir toutes les salles
+      operationId: getRooms
+      responses:
+        '200':
+          description: Liste des salles
+          content:
+            application/json:
+              schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Salle'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+  /projections:
+    get:
+      tags:
+        - Projections
+      summary: Voir toutes les projections 
+      operationId: getProjections
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des projections
+          content:
+            application/json:
+              schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Projection'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                  $ref: '#/components/schemas/BadRequest'
+  /films: 
+    get:
+      tags:
+        - Films
+      summary: Voir toutes les films
+      operationId: getfilms
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of films
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Film'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/BadRequest'
+    post:
+      tags:
+        - Films
+      summary: Ajouter des films 
+      operationId: CreateFilms
+      description: Ajouter des films à partir d'un tableau
+      requestBody:
+        description: films à créer
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateFilm'
+        required: true
+      responses:  
+        '200':
+            description: List of films
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/CreateFilm'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+    patch:
+      tags:
+        - Films
+      summary: Modifier un film
+      operationId: Updatefilm
+      description: |
+        Modifier les films avec
+        * titre 
+        * duree
+        * remume
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          required: true  
+      requestBody:
+        description: Informations à modifier pour le film
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Film'
+            examples:
+              changeTitleandDuration:
+                summary: Change le titre et la durée
+                description: Comment changer le titre et la durée
+                value:
+                  id: 1
+                  titre: "Prestige"
+                  duree: 120
+              changeResume:
+                summary: change résumé
+                value:
+                  resume: "Comment deux magiciens ..."
+        required: true
+      responses:  
+        '200':
+            description: Film modifié
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CreateFilm'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+        '404':
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/RessourceNotFound'
+    put:
+      tags:
+        - Films
+      summary: Modifier les informations d'un film
+      operationId: UpdateAllOfFilm
+      description: Modifier le film
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: integer
+          required: true  
+      requestBody:
+        description: Informations à modifier
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Film'
+        required: true
+      responses:  
+        '200':
+            description: Modifierd films
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Film'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+        '404':
+            description: Not found
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RessourceNotFound'
+  /films/{id}:
+    get:
+      tags: 
+        - Films
+      summary: Voir un Film
+      operationId: getFilmsById
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: A films
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CreateFilm'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/BadRequest'     
+    delete:
+      tags:
+        - Films
+      summary: Supprimer un film
+      operationId: DeletefilmsById
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: film supprimé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  200:
+                    type: string
+                    example: Ressource deleted
+
+        
+components:
+  schemas:
+    Salle:
+      type: object
+      properties:
+        nom:
+          type: string
+          example: A
+        capacite:
+          type: integer
+          example: 80
+    Film:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 12
+        titre: 
+          type: string
+          example: Tenet
+        duree:
+          type: integer
+          example: 60
+        resume:
+          type: string
+          example: A film by Chrisàpher Nolan ...
+    CreateFilm:
+      type: object
+      properties:
+        titre: 
+          type: string
+          example: Tenet
+        duree:
+          type: integer
+          example: 60
+        resume:
+          type: string
+          example: A film by Chrisàpher Nolan ...
+    
+    Projection:
+      type: object
+      properties:
+        id: 
+          type: object
+          example: 1
+        film:
+          type: object
+          $ref: '#/components/schemas/Film'
+        salle: 
+          type: object
+          $ref: '#/components/schemas/Salle'
+        diffusion:
+          type: string
+          format: date-time
+          example: '2022-03-13T20:30:00Z'
+    RessourceDeleted:
+      type: object
+      properties:
+        200:
+          type: string
+          example: Ressource deleted
+    BadRequest:
+      type: object
+      properties:
+        400:
+          type: string
+          example: Bad request   
+    RessourceNotFound:
+      type: object
+      properties:
+        404:
+          type: string
+          example: Ressource not found   
+    
+        

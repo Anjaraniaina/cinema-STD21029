@@ -37,6 +37,7 @@ paths:
       parameters:
         - name: page
           in: query
+          required: true
           schema:
             type: integer
         - name: page_size
@@ -68,6 +69,7 @@ paths:
       parameters:
         - name: page
           in: query
+          required: true
           schema:
             type: integer
         - name: page_size
@@ -133,7 +135,7 @@ paths:
         Modifier les films avec
         * titre 
         * duree
-        * remume
+        * resume
       parameters:
         - name: id
           in: query
@@ -263,10 +265,10 @@ paths:
       summary: Supprimer un film
       operationId: DeletefilmsById
       parameters:
-        - name: id
+        - name: titre
           in: path
           schema:
-            type: integer
+            type: string
           required: true
       responses:
         '200':
@@ -279,6 +281,45 @@ paths:
                   200:
                     type: string
                     example: Ressource deleted
+  /films/{categorie}: 
+    get:
+      tags:
+        - Films
+      summary: Voir les films par catégorie
+      operationId: getFilmsByCategorie
+      parameters:
+        - name: categorie
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: page_size
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Liste des films par catégorie
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Film'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/BadRequest'                  
 
         
 components:
@@ -306,7 +347,15 @@ components:
           example: 60
         resume:
           type: string
-          example: A film by Chrisàpher Nolan ...
+          example: A film by Christopher Nolan ...
+        categories:
+          type: array
+          items:
+            type: string
+          example:
+            - action
+            - comédie
+            - drame       
     CreateFilm:
       type: object
       properties:
@@ -318,8 +367,15 @@ components:
           example: 60
         resume:
           type: string
-          example: A film by Chrisàpher Nolan ...
-    
+          example: A film by Christopher Nolan ...
+        categories:
+          type: array
+          items:
+            type: string
+          example:
+            - action
+            - comedie
+            - drame
     Projection:
       type: object
       properties:

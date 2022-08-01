@@ -53,6 +53,40 @@ paths:
             application/json:
               schema: 
                 $ref: '#/components/schemas/BadRequest'
+    patch:
+      tags:
+        - Rooms
+      summary: Update a room
+      operationId: UpdateRoomById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                capacity:
+                  type: integer
+                  example: 80
+              
+      responses:
+        '200':
+          description: A room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
   /projections:
     get:
       tags:
@@ -339,10 +373,10 @@ paths:
     patch:
       tags:
         - Films
-      summary: Update a film
-      operationId: Updatefilm
+      summary: Update films
+      operationId: Updatefilms
       description: |
-        Modifier les films avec
+        Update films with
         * title 
         * duration
         * synopsis
@@ -363,7 +397,7 @@ paths:
         required: true
       responses:  
         '200':
-            description: Film modifié
+            description: Film updated
             content:
               application/json:
                 schema:
@@ -614,7 +648,7 @@ components:
         id:
           type: string
           example: A
-        capacite:
+        capacity:
           type: integer
           example: 80
     Film:
@@ -741,7 +775,7 @@ components:
       properties:
         hour: 
           type: string
-          format: date-time
+          example: '8:00'
         film: 
           $ref: '#/components/schemas/Film'
         room: 

@@ -1,27 +1,52 @@
 openapi: 3.0.1
 info:
-  title: 'Salle de cinema'
-  description: Gestion de projection de films
+  title: 'Movie theatre'
+  description: Film projections manager
   version: 1.0.0
 servers:
-  - url: https://salledecinema.com
+  - url: https://cinema-STD21029.com
 
 paths:
-  /salles: 
+  /rooms: 
     get:
       tags:
-        - Salles
-      summary: Voir toutes les salles
+        - Rooms
+      summary: Get all Rooms
       operationId: getRooms
       responses:
         '200':
-          description: Liste des salles
+          description: List of Rooms
           content:
             application/json:
               schema:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Salle'
+                    $ref: '#/components/schemas/Room'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/BadRequest'
+  /rooms/{id}:
+    get:
+      tags:
+        - Rooms
+      summary: Get a room
+      operationId: getRoomsById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: 
+            type: string
+      responses:
+        '200':
+          description: A room
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
         '400':
           description: Bad request
           content:
@@ -32,7 +57,7 @@ paths:
     get:
       tags:
         - Projections
-      summary: Voir toutes les projections 
+      summary: Get all projections 
       operationId: getProjections
       parameters:
         - name: page
@@ -47,7 +72,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Liste des projections
+          description: List of projections
           content:
             application/json:
               schema:
@@ -60,11 +85,192 @@ paths:
             application/json:
               schema: 
                   $ref: '#/components/schemas/BadRequest'
+    post:
+      tags:
+        - Projections
+      summary: Create a new projection
+      operationId: CreateProjection
+      requestBody:
+        description: Make a new projection
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/NewProjection'
+      responses:
+        '200':
+          description: A projection
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Projection'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                  $ref: '#/components/schemas/BadRequest'
+  /projections/{id}:
+    get:
+      tags:
+        - Projections
+      summary: Get a projection
+      operationId: getProjectionyId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A projection
+          content:
+            application/json:
+              schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Projection'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                  $ref: '#/components/schemas/BadRequest'
+    patch:
+      tags:
+        - Projections
+      summary: Update a projection
+      operationId: UpdateProjection
+      description: |
+        Update a projection with
+        * filmId 
+        * roomId
+        * diffusion
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: Informations à modifier pour le film
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Film'
+            examples:
+              changeFilm:
+                summary: update the film to show
+                description: How to update the filmId
+                value:
+                  filmId: 1
+              changeRoom: 
+                summary: update the room 
+                value:
+                  roomId: A
+              changeDiffusion:
+                summary: update the diffusion time
+                value:
+                  diffusion: '2022-03-13T20:30:00Z'
+        required: true
+      responses:  
+        '200':
+            description: Projectioin Updated
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Projection'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+        '404':
+            description: Not foad
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/RessourceNotFound'
+    put:
+      tags:
+        - Projections
+      summary: Update the whole projection
+      operationId: UpdateAllOfProjection
+      description: Update the whole projection
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: integer
+          required: true  
+      requestBody:
+        description: A projection to update
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/NewProjection'
+        required: true
+      responses:  
+        '200':
+            description:  UpdatedProjection
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Projection'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+        '404':
+            description: Not foad
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RessourceNotFound'
+    delete:
+      tags:
+        - Projections
+      summary: Delete a projection
+      operationId: DeleteProjectionById
+      parameters:
+        - name: id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: projection deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  200:
+                    type: string
+                    example: Ressource deleted  
+              
+
   /films: 
     get:
       tags:
         - Films
-      summary: Voir toutes les films
+      summary: Get all films
       operationId: getfilms
       parameters:
         - name: page
@@ -77,6 +283,10 @@ paths:
           required: true
           schema:
             type: integer
+        - name: category
+          in: query
+          schema: 
+            type: string
       responses:
         '200':
           description: List of films
@@ -97,11 +307,11 @@ paths:
     post:
       tags:
         - Films
-      summary: Ajouter des films 
+      summary: Create films 
       operationId: CreateFilms
-      description: Ajouter des films à partir d'un tableau
+      description: Create new Films from an array
       requestBody:
-        description: films à créer
+        description: films to create
         content:
           application/json:
             schema:
@@ -129,13 +339,13 @@ paths:
     patch:
       tags:
         - Films
-      summary: Modifier un film
+      summary: Update a film
       operationId: Updatefilm
       description: |
         Modifier les films avec
-        * titre 
-        * duree
-        * resume
+        * title 
+        * duration
+        * synopsis
       parameters:
         - name: id
           in: query
@@ -143,25 +353,13 @@ paths:
             type: integer
           required: true  
       requestBody:
-        description: Informations à modifier pour le film
+        description: Film to update
         content:
           application/json:
             schema:
               type: array
               items:
                 $ref: '#/components/schemas/Film'
-            examples:
-              changeTitleandDuration:
-                summary: Change le titre et la durée
-                description: Comment changer le titre et la durée
-                value:
-                  id: 1
-                  titre: "Prestige"
-                  duree: 120
-              changeResume:
-                summary: change résumé
-                value:
-                  resume: "Comment deux magiciens ..."
         required: true
       responses:  
         '200':
@@ -179,7 +377,7 @@ paths:
                   items: 
                     $ref: '#/components/schemas/BadRequest'
         '404':
-            description: Not found
+            description: Not foad
             content:
               application/json:
                 schema:
@@ -187,9 +385,9 @@ paths:
     put:
       tags:
         - Films
-      summary: Modifier les informations d'un film
+      summary: Update the whole film
       operationId: UpdateAllOfFilm
-      description: Modifier le film
+      description: Update the film
       parameters:
         - name: id
           in: query
@@ -197,7 +395,7 @@ paths:
             type: integer
           required: true  
       requestBody:
-        description: Informations à modifier
+        description: Film to update
         content:
           application/json:
             schema:
@@ -207,7 +405,7 @@ paths:
         required: true
       responses:  
         '200':
-            description: Modifierd films
+            description: Updated films
             content:
               application/json:
                 schema:
@@ -223,18 +421,46 @@ paths:
                   items: 
                     $ref: '#/components/schemas/BadRequest'
         '404':
-            description: Not found
+            description: Not foad
             content:
               application/json:
                 schema: 
                   type: array
                   items:
                     $ref: '#/components/schemas/RessourceNotFound'
+  /projections/week:
+    get:
+      tags:
+        - Projections
+      summary: Get a projection
+      operationId: getCalendar
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: A projection
+          content:
+            application/json:
+              schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Calendar'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema: 
+                  $ref: '#/components/schemas/BadRequest'
   /films/{id}:
     get:
       tags: 
         - Films
-      summary: Voir un Film
+      summary: Get a Film
       operationId: getFilmsById
       parameters:
         - name: id
@@ -262,17 +488,17 @@ paths:
     delete:
       tags:
         - Films
-      summary: Supprimer un film
+      summary: Delete a film
       operationId: DeletefilmsById
       parameters:
-        - name: titre
+        - name: title
           in: path
           schema:
             type: string
           required: true
       responses:
         '200':
-          description: film supprimé
+          description: film deleted
           content:
             application/json:
               schema:
@@ -281,14 +507,14 @@ paths:
                   200:
                     type: string
                     example: Ressource deleted
-  /films/{categorie}: 
+  /films/{category}: 
     get:
       tags:
         - Films
-      summary: Voir les films par catégorie
-      operationId: getFilmsByCategorie
+      summary: Get films by catogory
+      operationId: getFilmsByCategory
       parameters:
-        - name: categorie
+        - name: category
           in: path
           required: true
           schema:
@@ -305,7 +531,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Liste des films par catégorie
+          description: List of films by category
           content:
             application/json:
               schema:
@@ -319,15 +545,73 @@ paths:
               schema: 
                 type: array
                 items: 
-                  $ref: '#/components/schemas/BadRequest'                  
-
+                  $ref: '#/components/schemas/BadRequest'
+    put:
+      tags:
+        - Films
+      summary: Update a category
+      operationId: UpdateCategory
+      description: Update the category name
+      parameters:
+        - name: category
+          in: path
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        description: the category to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCategory'
+        required: true
+      responses:  
+        '200':
+            description: Projectioin Updated
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Category'
+        '400':
+            description: Bad request
+            content:
+              application/json:
+                schema: 
+                  type: array
+                  items: 
+                    $ref: '#/components/schemas/BadRequest'
+        '404':
+            description: Not foad
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/RessourceNotFound'
+    delete:
+      tags:
+        - Films
+      summary: Delete a category
+      operationId: DeleteCategoryById
+      parameters:
+        - name: category
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: category deleted
+          content:
+             application/json:
+                schema:
+                  $ref: '#/components/schemas/RessourceDeleted'
+    
         
 components:
   schemas:
-    Salle:
+    Room:
       type: object
       properties:
-        nom:
+        id:
           type: string
           example: A
         capacite:
@@ -339,13 +623,13 @@ components:
         id: 
           type: integer
           example: 12
-        titre: 
+        title: 
           type: string
           example: Tenet
-        duree:
+        duration:
           type: integer
           example: 60
-        resume:
+        synopsis:
           type: string
           example: A film by Christopher Nolan ...
         categories:
@@ -354,18 +638,36 @@ components:
             type: string
           example:
             - action
-            - comédie
-            - drame       
+            - comedie
+            - drame  
+    NewCategory:
+      type: object
+      properties:
+        category:
+          type: string
+          example: drame
+    Category:
+      type: object
+      properties:
+        id: 
+          type: integer
+          example: 2
+        category:
+          type: string
+          example: drame   
+        creationDate: 
+          type: string
+          format: date-time
     CreateFilm:
       type: object
       properties:
-        titre: 
+        title: 
           type: string
           example: Tenet
-        duree:
+        duration:
           type: integer
           example: 60
-        resume:
+        synopsis:
           type: string
           example: A film by Christopher Nolan ...
         categories:
@@ -382,16 +684,71 @@ components:
         id: 
           type: object
           example: 1
-        film:
-          type: object
-          $ref: '#/components/schemas/Film'
-        salle: 
-          type: object
-          $ref: '#/components/schemas/Salle'
+        filmId:
+          type: integer
+          example: 1
+        roomId:
+          type: string
+          default: A
+          enum:
+            - A
+            - B
         diffusion:
           type: string
           format: date-time
           example: '2022-03-13T20:30:00Z'
+    NewProjection:
+      type: object
+      properties:
+        filmId:
+          type: integer
+          example: 1
+        roomId:
+          type: string
+          default: A
+          enum:
+            - A
+            - B
+        diffusion:
+          type: string
+          format: date-time
+          example: '2022-03-13T20:30:00Z'
+    Calendar:
+      type: object
+      properties:
+        week:
+          type: string
+          format: date-time
+        till:
+          type: string
+          format: date-time
+        calendar: 
+          type: array
+          items:
+            $ref: '#/components/schemas/Day'
+    Day:
+      type: object
+      properties:
+        day: 
+          type: integer
+          example: 1
+        projections:
+          type: array
+          items:
+            $ref: '#/components/schemas/CurrentProjection'
+    CurrentProjection:
+      type: object
+      properties:
+        hour: 
+          type: string
+          format: date-time
+        film: 
+          $ref: '#/components/schemas/Film'
+        room: 
+          $ref: '#/components/schemas/Room'
+
+
+
     RessourceDeleted:
       type: object
       properties:
